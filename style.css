@@ -71,12 +71,7 @@ input {
   outline: transparent;
   /* outline-offset: 1px; */
 }
-.first-name,
-.last-name,
-.display-name,
-.email-address,
-.password,
-.password-conf {
+.fields {
   margin-bottom: 20px;
   width: 270px;
   height: 70px;
@@ -87,8 +82,17 @@ input {
   border: solid 1px transparent;
   border-radius: 4px;
 
-  background-color: var(--main-col);
-  
+  background-color: var(--main-col); 
+}
+
+.error-message {
+  width: 570px;
+  margin: 0 15px 15px 15px;
+  text-align: center;
+  font-size: 0.8em;
+  color: rgb(245, 36, 36);
+
+  border: 1px solid rgb(245, 36, 36);
 }
 
 .main-item {
@@ -111,7 +115,6 @@ input {
 
   color: var(--main-col);
   background-color: var(--main-bgc);
-
 }
 
 .radio {
