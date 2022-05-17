@@ -181,16 +181,18 @@ errorMessage.className = 'error-message';
 const forma = document.querySelector('.main-form');
 
 function checkInputField(event){
-
   errorMessage.textContent = `Field ${event.target.placeholder} cannot be empty`;
   const beforeElement = event.target.parentNode.nextSibling;  //*отримуєм елемент, наступний за батьківським
   // const required = event.target.classList.contains('required');
 
-  if(!event.target.value){  //*значення цілі події
+  if(!event.target.value && event.target.classList.contains('required')){  //*значення цілі події
     forma.insertBefore(errorMessage, beforeElement);
-    // event.target.style.border-color
+    event.target.style.borderColor = 'red';
+  }else if(event.target.value){
+    errorMessage.remove();
+    event.target.style.borderColor = 'green';
   }
-  // style border - color green
+  // return event.target.nextSibling;
 }
 forma.addEventListener('focusout', checkInputField);
 
