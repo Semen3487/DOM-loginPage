@@ -44,13 +44,13 @@ const shellName = document.createElement('div');
 shellName.className = 'main-item';
 
 const firstName = document.createElement('input');
-firstName.classList.add('fields', 'required');
+firstName.classList.add('fields', 'required', 'sending', 'unchecking', 'clear');
 firstName.id = 'first-name';
 firstName.setAttribute('name', 'fName');
 firstName.setAttribute('placeholder', 'First name');
 
 const lastName = document.createElement('input');
-lastName.classList.add('fields', 'required');
+lastName.classList.add('fields', 'required', 'sending', 'unchecking', 'clear');
 lastName.id = 'last-name';
 lastName.setAttribute('name', 'lName');
 lastName.setAttribute('placeholder', 'Last name');
@@ -59,30 +59,31 @@ const shellDisName = document.createElement('div');
 shellDisName.className = 'main-item';
 
 const displayName = document.createElement('input');
-displayName.classList.add('fields', 'required');
+displayName.classList.add('fields', 'required', 'sending', 'unchecking', 'clear');
 displayName.id = 'display-name';
 displayName.setAttribute('name', 'dName');
 displayName.setAttribute('placeholder', 'Display Name');
 
 const eMail = document.createElement('input');
-eMail.classList.add('fields', 'required');
+eMail.classList.add('fields', 'required', 'sending', 'clear');
 eMail.id = 'email-address';
-eMail.setAttribute('type', 'email');
+// eMail.setAttribute('type', 'email');
 eMail.setAttribute('name', 'emailAdd');
 eMail.setAttribute('placeholder', 'Email Address');
 
 const shellPassword = document.createElement('div');
-shellPassword.className = 'main-item';
+shellPassword.classList.add('main-item', 'password-container');
+shellPassword.id = 'password-field';
 
 const password = document.createElement('input');
-password.classList.add('fields', 'required');
+password.classList.add('fields', 'required', 'clear');
 password.id = 'password';
 password.setAttribute('type', 'password');
 password.setAttribute('name', 'pass');
 password.setAttribute('placeholder', 'Password');
 
 const passwordConfirm = document.createElement('input');
-passwordConfirm.classList.add('fields', 'required');
+passwordConfirm.classList.add('fields', 'required', 'clear');
 passwordConfirm.id = 'password-conf';
 passwordConfirm.setAttribute('type', 'password');
 passwordConfirm.setAttribute('name', 'passConf');
@@ -95,7 +96,7 @@ const formBuyer = document.createElement('div');
 formBuyer.className = 'form-radio';
 
 const joinBuyer = document.createElement('input');
-joinBuyer.className = 'radio';
+joinBuyer.classList.add('radio');
 joinBuyer.id = 'choiceBuyer'
 joinBuyer.setAttribute('type', 'radio');
 joinBuyer.setAttribute('name', 'join');
@@ -114,7 +115,7 @@ const formSeller = document.createElement('div');
 formSeller.className = 'form-radio';
 
 const joinSeller = document.createElement('input');
-joinSeller.className = 'radio';
+joinSeller.classList.add('radio');
 joinSeller.id = 'choiceSeller';
 joinSeller.setAttribute('type', 'radio');
 joinSeller.setAttribute('name', 'join');
@@ -133,16 +134,22 @@ const shellToSend = document.createElement('div');
 shellToSend.className = 'main-checkbox';
 
 const toSend = document.createElement('input');
-toSend.className = 'checkbox';
+toSend.classList.add('checkbox', 'sending', 'clear');
 toSend.id = 'choiceToSend';
 toSend.setAttribute('type', 'checkbox');
-toSend.setAttribute('name', 'checkbox1');
-toSend.setAttribute('value', 'checked');
+toSend.setAttribute('name', 'offers');
 
 const markToSend = document.createElement('label');
 markToSend.className = 'checkbox-name';
 markToSend.setAttribute('for', 'choiceToSend');
 markToSend.textContent = 'Allow Squadhelp to send marketing/promotional offers from time to time';
+
+const shellCancel = document.createElement('div');
+shellCancel.className = 'main-clear';
+
+const clearButton = document.createElement('button');
+clearButton.className = 'clear-item';
+clearButton.textContent = 'Cancel';
 
 const shellMainButton = document.createElement('div');
 shellMainButton.className = 'main-button';
@@ -163,7 +170,7 @@ login.append(loginButton);
 main.append(mainInner);
 mainInner.append(shellH1, form);
 shellH1.append(h1, mainP);
-form.append(shellName, shellDisName, shellPassword, shellRadio, shellToSend, shellMainButton);
+form.append(shellName, shellDisName, shellPassword, shellRadio, shellToSend, shellCancel, shellMainButton);
 shellName.append(firstName, lastName);
 shellDisName.append(displayName, eMail);
 shellPassword.append(password, passwordConfirm);
@@ -171,6 +178,7 @@ shellRadio.append(formBuyer, formSeller);
 formBuyer.append(joinBuyer, markBuyer, descriptionBuyer);
 formSeller.append(joinSeller, markSeller, descriptionSeller);
 shellToSend.append(toSend, markToSend);
+shellCancel.append(clearButton);
 shellMainButton.append(mainButton);
 
 //* update
@@ -180,31 +188,149 @@ errorMessage.className = 'error-message';
 
 const forma = document.querySelector('.main-form');
 
-function checkInputField(event){
+function checkEmptyField(event) {
   errorMessage.textContent = `Field ${event.target.placeholder} cannot be empty`;
   const beforeElement = event.target.parentNode.nextSibling;  //*отримуєм елемент, наступний за батьківським
-  // const required = event.target.classList.contains('required');
-
-  if(!event.target.value && event.target.classList.contains('required')){  //*значення цілі події
+  
+  if (!event.target.value && event.target.classList.contains('required')){  //*значення цілі події
     forma.insertBefore(errorMessage, beforeElement);
     event.target.style.borderColor = 'red';
-  }else if(event.target.value){
+    
+  } else if(event.target.value && event.target.classList.contains('required') && !event.target.classList.contains('unchecking')){
+    errorMessage.remove();
+
+  } else if(event.target.value && event.target.classList.contains('required', 'unchecking')){
     errorMessage.remove();
     event.target.style.borderColor = 'green';
   }
-  // return event.target.nextSibling;
 }
-forma.addEventListener('focusout', checkInputField);
+forma.addEventListener('focusout', checkEmptyField);
+
+
+const errorMessEmail = document.createElement('div');
+errorMessEmail.className = 'error-message';
+
+const emailCheck = document.getElementById('email-address');
+
+function checkEmailField(event){
+  const regExpEmail = /^\w+\.?\w+@[a-z]{3,8}\.[a-z]{2,5}$/gi;
+  errorMessEmail.textContent = 'Please check the format of email address';
+
+  if(!regExpEmail.test(event.target.value)){
+    forma.insertBefore(errorMessEmail, shellPassword);
+    event.target.style.borderColor = 'red';
+  } else{
+    errorMessEmail.remove();
+    event.target.style.borderColor = 'green';
+  }  
+}
+emailCheck.addEventListener('focusout', checkEmailField);
+
+
+const errorMessPassword = document.createElement('div');
+errorMessPassword.className = 'error-message';
+
+const passwordCheck = document.querySelector('.password-container');
+
+function checkPasswordField(event){
+  errorMessPassword.textContent = 'Password confirmation needs to match original password';
+  const passw = document.getElementById('password');
+  const passwConf = document.getElementById('password-conf');
+  const regExpPassword = /[\w]{2,15}/gi;
+
+  if(passw.value !== passwConf.value && !regExpPassword.test(event.target.value)){
+    forma.insertBefore(errorMessPassword, shellRadio);
+    passw.style.borderColor = 'red';
+    passwConf.style.borderColor = 'red';
+
+  } else if(passw.value === passwConf.value && regExpPassword.test(event.target.value)){
+    errorMessPassword.remove();
+    passw.style.borderColor = 'green';
+    passwConf.style.borderColor = 'green';
+  }
+}
+passwordCheck.addEventListener('focusout', checkPasswordField);
+
+
+//* submit
+
+const submit = document.querySelector('.button');
+
+class Person {
+  constructor(fName, lName, dName, emailAdd, join, offers) {
+    this.fName = fName;
+    this.lName = lName;
+    this.dName = dName;
+    this.emailAdd = emailAdd;
+    this.join = join;
+    this.offers = offers;
+  }
+}
+
+const sendObj = new Person();
+
+function sendElementsValue (e){
+  e.preventDefault();
+  const sends = Array.from(document.getElementsByClassName('sending'));
+  const radios = Array.from(document.getElementsByName('join'));
+
+  sends.forEach((element) => {
+    if(element.checked){
+      sendObj[element.name] = element.checked;
+    }else{
+      sendObj[element.name] = element.value;
+    }
+  });
+  radios.forEach((element) => sendObj[element.name] = element.value);
+  
+  localStorage.setItem(`${sendObj.lName}`, JSON.stringify(sendObj)); 
+  console.log(sendObj);
+}
+submit.addEventListener('click', sendElementsValue);
+
+
+//* cancel
+
+const cancel = document.querySelector('.clear-item');
+
+function clearAllFields(e){
+  e.preventDefault();
+  const sendClassName = Array.from(document.getElementsByClassName('clear'));
+  const radioName = Array.from(document.getElementsByName('join'));
+  errorMessage.remove();
+  errorMessEmail.remove();
+  errorMessPassword.remove();
+
+  sendClassName.forEach((element) => {
+    element.checked = '';
+    element.value = '';
+    element.style.borderColor = 'transparent';
+  });
+  radioName.forEach((element) => element.checked = '');
+}
+cancel.addEventListener('click', clearAllFields);
+
 
 
 
 //todo
+
+//* radio button
+// submit.addEventListener('click', (e) => {
+//   e.preventDefault();
+//   const radios = document.getElementsByName('join');
+//   radios.forEach((element) => {
+//     if(element.checked){
+//       console.log(`${element.value}`);
+//     }
+//     return element.value
+//   });
+// }); 
+
+
 // const mainForm = document.forms.main;
 // const fName = mainForm.firstName;
 // const fNamePlaceholder = fName.placeholder;
-
-// const checkFname = fName.replace(/^\s+|\s+$/g, '');
-// console.dir(fName);
 
 
 //todo
@@ -215,19 +341,56 @@ forma.addEventListener('focusout', checkInputField);
 // errorMessDisName.className = 'error-message';
 // errorMessDisName.textContent = 'Display name should be more than 4 characters';
 
-// const errorMessEmail = document.createElement('div');
-// errorMessEmail.className = 'error-message';
-// errorMessEmail.textContent = 'Please check the format of email address';
+// const forma = document.querySelector('.main-form');
 
-// const errorMessPassword = document.createElement('div');
-// errorMessPassword.className = 'error-message';
-// errorMessPassword.textContent = 'Password confirmation needs to match original password';
+// function checkInputField(event) {
+//   errorMessage.textContent = `Field ${event.target.placeholder} cannot be empty`;
+//   const beforeElement = event.target.parentNode.nextSibling;  //*отримуєм елемент, наступний за батьківським
 
+//   if (!event.target.value && event.target.classList.contains('required')) {  //*значення цілі події
+//     forma.insertBefore(errorMessage, beforeElement);
+//     event.target.style.borderColor = 'red';
+//   } else if (event.target.value && event.target.classList.contains('required')) {
+//     errorMessage.remove();
+//     event.target.style.borderColor = 'green';
+//   }
+// }
+// forma.addEventListener('focusout', checkInputField);
+// const checkPassword = document.getElementById('password-field');
 
-// const fName = document.getElementById('first-name');
-// const lName = document.getElementById('last-name');
-// const disName = document.getElementById('display-name');
-// const emailAdd = document.getElementById('email-address');
-// const passw = document.getElementById('password');
-// const passwConf = document.getElementById('password-conf');
+// const beforeRadio = document.querySelector('.main-radio');
 
+// function checkPasswordFields(e){
+//   e.preventDefault();
+//   const passw = document.getElementById('password');
+//   const passwConf = document.getElementById('password-conf');
+//   const beforeElement = e.target.parentNode.nextSibling;
+
+//   if(e.target.value && passw.value !== passwConf.value){
+//     checkPassword.insertBefore(errorMessPassword, beforeElement);
+//     passw.style.borderColor = 'red';
+//     passwConf.style.borderColor = 'red';
+//   } else if(e.target.value && passw.value === passwConf.value){
+//     errorMessPassword.remove();
+//     passw.style.borderColor = 'green';
+//     passwConf.style.borderColor = 'green';
+//   }
+// }
+// checkPassword.addEventListener('focusout', checkPasswordFields);
+
+// function checkPasswordFields(e){
+//   e.preventDefault();
+//   const passw = document.getElementById('password');
+//   const passwConf = document.getElementById('password-conf');
+
+//   if(passw.value !== passwConf.value){
+//     checkPassword.insertBefore(errorMessPassword, beforeRadio);
+//     passw.style.borderColor = 'red';
+//     passwConf.style.borderColor = 'red';
+//   } else if(passw.value === passwConf.value){
+//     errorMessPassword.remove();
+//     passw.style.borderColor = 'green';
+//     passwConf.style.borderColor = 'green';
+//   }
+// }
+// checkPassword.addEventListener('focusout', checkPasswordFields);
